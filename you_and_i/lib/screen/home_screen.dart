@@ -9,6 +9,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  DateTime selectedDate = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,24 +23,54 @@ class _HomeScreenState extends State<HomeScreen> {
         bottom: false,
         child: Column(
           children: [
-            _Top(),
+            _Top(selectedDate: selectedDate,
+              onPressed: onHeartPressed,
+            ),
             _Bottom(),
           ],
         ),
       ),
     );
   }
+
+  void onHeartPressed  () {
+    showCupertinoDialog(
+      context: context,
+      barrierDismissible: true, // 외부 공간 클릭하면 Dialog 닫힘
+      builder: (BuildContext context) {
+        return Align(
+          alignment: Alignment.center, // 위치를 정의하지 않으면 사이즈 설정 불가
+          child: Container(
+            color: Colors.white,
+            height: 300.0,
+            child: CupertinoDatePicker(
+              mode: CupertinoDatePickerMode.date,
+              initialDateTime: selectedDate,
+              maximumDate: DateTime.now(),
+              dateOrder: DatePickerDateOrder.ymd,
+              onDateTimeChanged: (DateTime date) {
+                //선택한 날짜를 콜백으로 받음
+                setState(() {
+                  selectedDate = date;
+                });
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 }
 
-class _Top extends StatefulWidget {
-  const _Top({super.key});
 
-  @override
-  State<_Top> createState() => _TopState();
-}
-
-class _TopState extends State<_Top> {
-  DateTime selectedDate = DateTime.now();
+class _Top extends StatelessWidget {
+  final DateTime selectedDate;
+  final VoidCallback? onPressed;
+  const _Top({
+    required this.selectedDate,
+    required this.onPressed,
+    super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -99,31 +131,7 @@ class _TopState extends State<_Top> {
               //   ),
               // ),
               IconButton(
-                onPressed: () {
-                  showCupertinoDialog(
-                    context: context,
-                    barrierDismissible: true, // 외부 공간 클릭하면 Dialog 닫힘
-                    builder: (BuildContext context) {
-                      return Align(
-                        alignment: Alignment.center, // 위치를 정의하지 않으면 사이즈 설정 불가
-                        child: Container(
-                          color: Colors.white,
-                          height: 300.0,
-                          child: CupertinoDatePicker(
-                            mode: CupertinoDatePickerMode.date,
-                            dateOrder: DatePickerDateOrder.ymd,
-                            onDateTimeChanged: (DateTime date) {
-                              //선택한 날짜를 콜백으로 받음
-                              setState(() {
-                                selectedDate = date;
-                              });
-                            },
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
+                onPressed: onPressed,
                 icon: Icon(Icons.favorite),
                 iconSize: 60.0,
                 color: Colors.white,
