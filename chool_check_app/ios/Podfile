@@ -1,0 +1,20 @@
+platform :ios, '14.0'
+
+# Add this line if it doesn't exist
+use_frameworks!
+
+target 'Runner' do
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'))
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  flutter_root = File.expand_path('..', '..', 'Flutter')
+  load File.join(flutter_root, 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
+
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+
+  install_all_flutter_pods(flutter_application_path)
+end
