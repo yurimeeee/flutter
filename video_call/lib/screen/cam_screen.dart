@@ -106,14 +106,14 @@ class _CamScreenState extends State<CamScreen> {
                 Container(
                   width: 120.0,
                   height: 160.0,
-                child: AgoraVideoView(
-            controller: VideoViewController(
-            rtcEngine: engine!,
-            canvas: VideoCanvas(
-            uid: uid,
-            ),
-            ),
-            ),
+                  child: AgoraVideoView(
+                    controller: VideoViewController(
+                      rtcEngine: engine!,
+                      canvas: VideoCanvas(
+                        uid: uid,
+                      ),
+                    ),
+                  ),
                 ),
                 Positioned(
                   bottom: 16.0,
