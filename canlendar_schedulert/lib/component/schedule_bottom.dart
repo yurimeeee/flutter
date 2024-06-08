@@ -101,7 +101,7 @@ class _Time extends StatelessWidget {
           children: [
             Expanded(
               child: CustomTextFiled(
-                label: '시작시간',
+                label: '시작 시간',
                 onSaved:onStartSaved,
                 validator: onStartValidate,
               ),
@@ -111,7 +111,7 @@ class _Time extends StatelessWidget {
             ),
             Expanded(
               child: CustomTextFiled(
-                label: '종료시간',
+                label: '종료 시간',
                 onSaved: onEndSaved,
                 validator: onEndValidate,
               ),
