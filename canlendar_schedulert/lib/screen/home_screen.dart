@@ -49,12 +49,39 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
+        onPressed: () async {
+          final schedule = await showModalBottomSheet<Schedule>(
               context: context,
               builder: (_) {
-                return ScheduleBottom();
+                return ScheduleBottom(selectedDay: selectedDay,);
               });
+
+          if(schedule == null){
+            return;
+          }
+
+          final dateExists = schedules.containsKey(schedule.date);
+          //생성하려는 일정에 날짜가 스케줄 목록에 있는지 확인
+
+          final List<Schedule> existingSchedules = dateExists? schedules[schedule.date]! : [];
+          existingSchedules.add(schedule);
+
+          // setState(() {
+          //   schedules = {
+          //     ...schedules,
+          //     schedule.date: existingSchedules,
+          //   };
+          // });
+          setState(() {
+            schedules = {
+              ...schedules,
+              schedule.date: [
+              if(schedules.containsKey(schedule.date))
+                ...schedules[schedule.date]!,
+                schedule,
+              ]
+            };
+          });
         },
         child: Icon(
           Icons.add,

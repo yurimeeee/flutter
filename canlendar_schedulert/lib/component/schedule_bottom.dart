@@ -1,15 +1,27 @@
 import 'package:canlendar_schedulert/component/custom_text_filed.dart';
 import 'package:canlendar_schedulert/const/colors.dart';
+import 'package:canlendar_schedulert/model/schedule.dart';
 import 'package:flutter/material.dart';
 
 class ScheduleBottom extends StatefulWidget {
-  const ScheduleBottom({super.key});
+  final DateTime selectedDay;
+
+  const ScheduleBottom({
+    super.key,
+    required this.selectedDay,
+  });
 
   @override
   State<ScheduleBottom> createState() => _ScheduleBottomState();
 }
 
 class _ScheduleBottomState extends State<ScheduleBottom> {
+  final GlobalKey<FormState> formKey = GlobalKey();
+  // 프로젝트 내에 단 하나의 값만 존재하는 키캆 만듦 > 폼의 상태를 저장
+
+  int? startTime;
+  int? endTime;
+  String? content;
   String selectedColor = categoryColors.first;
 
   @override
@@ -25,6 +37,7 @@ class _ScheduleBottomState extends State<ScheduleBottom> {
             right: 16.0,
           ),
           child: Form(
+            key: formKey,
             child: Column(
               children: [
                 _Time(
@@ -36,7 +49,7 @@ class _ScheduleBottomState extends State<ScheduleBottom> {
                 SizedBox(height: 8.0),
                 _Content(
                     onSaved: onContentSaved,
-                    onValidate: onContentValidate.
+                    onValidate: onContentValidate,
                 ),
                 SizedBox(height: 8.0),
                 _Categories(
@@ -47,7 +60,7 @@ class _ScheduleBottomState extends State<ScheduleBottom> {
                       });
                     }),
                 SizedBox(height: 8.0),
-                _SaveButton(),
+                _SaveButton(onPressed: onSavePressed),
               ],
             ),
           ),
@@ -57,21 +70,77 @@ class _ScheduleBottomState extends State<ScheduleBottom> {
   }
 
   void onStartTimeSaved(String? val){
-
+    if(val == null){
+      return;
+    }
+    startTime = int.parse(val);
   }
   String? onStartTimeValidate(String? val){
-
+    if(val == null){
+      return '값을 입력 해주세요.';
+    }
+    if(int.tryParse(val) == null){
+      return '숫자를 입력 해주세요.';
+    }
+    final time = int.tryParse(val);
+    if(time! > 24 || time < 0){
+      return '0과 24 사이의 숫자를 입력 해주세요.';
+    }
   }
   void onEndTimeSaved(String? val){
-
+    if(val == null){
+      return;
+    }
+    endTime = int.parse(val);
   }
   String? onEndTimeValidate(String? val){
+    if(val == null){
+      return '값을 입력 해주세요.';
+    }
+    if(int.tryParse(val) == null){
+      return '숫자를 입력 해주세요.';
+    }
 
+    final time = int.tryParse(val);
+    if(time! > 24 || time < 0){
+      return '0과 24 사이의 숫자를 입력 해주세요.';
+    }
   }
   void onContentSaved(String? val){
-
+    if(val == null){
+      return;
+    }
+    content = val;
   }
   String? onContentValidate(String? val){
+    if(val == null){
+      return '내용을 입력 해주세요.';
+    }
+    if(val.length < 5){
+      return '5자 이상을 입력 해주세요.';
+    }
+    return null;
+  }
+
+  void onSavePressed(){
+    final isValid = formKey.currentState!.validate();
+
+    if(isValid) {
+      formKey.currentState!.save();
+
+      final schedule = Schedule(
+        id: 999,
+        startTime: startTime!,
+        endTime: endTime!,
+        content: content!,
+        color: selectedColor,
+        date: widget.selectedDay,
+        createAt: DateTime.now().toUtc(),
+      );
+
+      Navigator.of(context).pop();
+    }
+
 
   }
 }
@@ -81,9 +150,6 @@ class _Time extends StatelessWidget {
   final FormFieldSetter<String> onEndSaved;
   final FormFieldValidator<String> onStartValidate;
   final FormFieldValidator<String> onEndValidate;
-
-  // final GlobalKey<FormState> formKey = GlobalKey();
-  // 프로젝트 내에 단 하나의 값만 존재하는 키캆 만듦 > 폼의 상태를 저장
 
   _Time({
     super.key,
@@ -146,12 +212,13 @@ class _Content extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-        child: CustomTextFiled(
+      child: CustomTextFiled(
       label: '내용',
       expand: true,
       onSaved: onSaved,
       validator: onValidate,
-    ));
+      ),
+    );
   }
 }
 
@@ -206,7 +273,12 @@ class _Categories extends StatelessWidget {
 }
 
 class _SaveButton extends StatelessWidget {
-  const _SaveButton({super.key});
+  final VoidCallback onPressed;
+
+  const _SaveButton({
+    super.key,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -214,7 +286,7 @@ class _SaveButton extends StatelessWidget {
       children: [
         Expanded(
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: onPressed,
             child: Text('저장'),
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryColor,
